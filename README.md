@@ -137,7 +137,63 @@ curl -X POST "http://localhost:8001/detect" \
   "image_with_boxes": "uuid_detected_image.jpg"
 }
 ```
+## 🔧 API Endpoints
+
+### AI Service (Port 8001)
+GET / — Service health check
+GET /health — Detailed health status
+POST /detect — Main object detection endpoint
+
+### UI Service (Port 8081)
+GET / — Web interface
+POST /upload — Image upload endpoint
+GET /download/{filename} — File download
+
+## 🎯 Detection Capabilities
+
+The system can detect 80+ common objects, including:
+🚗 Vehicles (cars, trucks, buses, bicycles)
+🏠 Indoor objects (chairs, tables, TV, laptop)
+🍕 Food items (pizza, banana, apple, bottle)
+🐶 Animals (cat, dog, bird, horse)
+👥 People and accessories
+
+## 🚀 Performance
+
+Model: SSD300 with VGG16 backbone
+Classes: 80 COCO dataset categories
+Inference Time: ~2–3 seconds on CPU
+Accuracy: State-of-the-art object detection
+Scalability: Containerized microservices
+
+## 🔒 Error Handling
+
+✅ Comprehensive input validation
+✅ Graceful error recovery
+✅ Detailed logging for debugging
+✅ User-friendly error messages
+
+## 🙏 Acknowledgments
+
+COCO Dataset for training data
+PyTorch team
+FastAPI framework
+Docker containerization solutions
 
 
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/improvement`)
+3. Commit changes (`git commit -am 'Add new feature'`)
+4. Push to branch (`git push origin feature/improvement`)
+5. Open a Pull Request
 
 
+## 📞 Contact
+
+**Developer:** Aatmaj  
+**Contact:** aatmaj017@gamil.com  
+**Year:** 2025
