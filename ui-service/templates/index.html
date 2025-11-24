@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Detection App</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Object Detection App</h1>
+        
+        <div class="upload-section">
+            <h2>Upload Image</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" id="imageInput" name="file" accept="image/*" required>
+                <button type="submit">Detect Objects</button>
+            </form>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <p>Processing image... This may take a few seconds.</p>
+        </div>
+
+        <div id="results" class="results" style="display: none;">
+            <h2>Detection Results</h2>
+            
+            <div class="result-container">
+                <div class="image-section">
+                    <h3>Processed Image</h3>
+                    <img id="resultImage" src="" alt="Processed Image">
+                </div>
+                
+                <div class="detections-section">
+                    <h3>Detected Objects</h3>
+                    <div id="detectionsList"></div>
+                    
+                    <div class="download-links">
+                        <a id="downloadJson" href="#" class="download-btn">Download JSON</a>
+                        <a id="downloadImage" href="#" class="download-btn">Download Image</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="error" class="error" style="display: none;">
+            <p id="errorMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('imageInput');
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            // Show loading, hide results and error
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    // Display results
+                    document.getElementById('resultImage').src = `/download/${result.image_file}`;
+                    
+                    // Display detections
+                    const detectionsList = document.getElementById('detectionsList');
+                    detectionsList.innerHTML = '';
+                    
+                    if (result.detections.length === 0) {
+                        detectionsList.innerHTML = '<p>No objects detected</p>';
+                    } else {
+                        const list = document.createElement('ul');
+                        result.detections.forEach(detection => {
+                            const item = document.createElement('li');
+                            item.innerHTML = `
+                                <strong>${detection.class}</strong><br>
+                                Confidence: ${(detection.confidence * 100).toFixed(2)}%<br>
+                                BBox: [${detection.bbox.x1.toFixed(0)}, ${detection.bbox.y1.toFixed(0)}, 
+                                      ${detection.bbox.x2.toFixed(0)}, ${detection.bbox.y2.toFixed(0)}]
+                            `;
+                            list.appendChild(item);
+                        });
+                        detectionsList.appendChild(list);
+                    }
+                    
+                    // Set download links
+                    document.getElementById('downloadJson').href = `/download/${result.json_file}`;
+                    document.getElementById('downloadImage').href = `/download/${result.image_file}`;
+                    
+                    document.getElementById('results').style.display = 'block';
+                } else {
+                    throw new Error(result.error || 'Unknown error occurred');
+                }
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = error.message;
+                document.getElementById('error').style.display = 'block';
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
